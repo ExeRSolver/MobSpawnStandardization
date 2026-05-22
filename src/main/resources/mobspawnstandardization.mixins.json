@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "exersolver.mobspawnstandardization.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  },
+  "mixins": [
+    "MinecraftServerMixin",
+    "SpawnHelperMixin"
+  ]
+}
