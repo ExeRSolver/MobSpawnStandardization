@@ -10,7 +10,9 @@ import java.util.Random;
 public class RNGManager {
     private final HashMap<SpawningRNGSection, Random> rngMap = new HashMap<>();
     private final long rngSeed;
-    private Random currentRNG;
+    public Random baseRandom;
+    public Random offsetRandom;
+    public Random mobRandom;
 
     public RNGManager(long rngSeed) {
         this.rngSeed = rngSeed;
@@ -24,11 +26,7 @@ public class RNGManager {
             rng = new Random(mixSeed(this.rngSeed, section.chunkX, section.chunkZ, section.dimensionId, section.categoryId));
             this.rngMap.put(section, rng);
         }
-        this.currentRNG = new Random(rng.nextLong());
-    }
-
-    public Random getRNG() {
-        return this.currentRNG;
+        this.baseRandom = new Random(rng.nextLong());
     }
 
     private static long mixSeed(long rngSeed, int... salts) {

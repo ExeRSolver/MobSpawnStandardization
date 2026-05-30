@@ -2,16 +2,14 @@ package exersolver.mobspawnstandardization.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import exersolver.mobspawnstandardization.IMinecraftServer;
+import exersolver.mobspawnstandardization.rng.RNGManager;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.SpawnHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Random;
@@ -35,7 +33,7 @@ public abstract class SpawnHelperMixin {
             )
     )
     private static int standardizeSpawnPos(Random original, int i, @Local(argsOnly = true) World world) {
-        Random rng = ((IMinecraftServer) world.getServer()).mobspawn$getRNGManager().getRNG();
+        Random rng = ((IMinecraftServer) world.getServer()).mobspawn$getRNGManager().baseRandom;
         return rng.nextInt(i);
     }
 
@@ -48,7 +46,10 @@ public abstract class SpawnHelperMixin {
             )
     )
     private static float standardizeAttemptCount(Random original, @Local(argsOnly = true) ServerWorld world) {
-        Random rng = ((IMinecraftServer) world.getServer()).mobspawn$getRNGManager().getRNG();
+        RNGManager rngManager = ((IMinecraftServer) world.getServer()).mobspawn$getRNGManager();
+        Random rng = rngManager.baseRandom;
+        rngManager.offsetRandom = new Random(rng.nextLong());
+        rngManager.mobRandom = new Random(rng.nextLong());
         return rng.nextFloat();
     }
 
@@ -57,10 +58,20 @@ public abstract class SpawnHelperMixin {
             at = @At(
                     value = "INVOKE",
                     target = "Ljava/util/Random;nextInt(I)I"
+            ),
+            slice = @Slice(
+                    from = @At(
+                            value = "HEAD"
+                    ),
+                    to = @At(
+                            value = "INVOKE",
+                            target = "Ljava/util/Random;nextInt(I)I",
+                            ordinal = 3
+                    )
             )
     )
-    private static int standardizeOffsetsAndSize(Random original, int i, @Local(argsOnly = true) ServerWorld world) {
-        Random rng = ((IMinecraftServer) world.getServer()).mobspawn$getRNGManager().getRNG();
+    private static int standardizeOffset(Random original, int i, @Local(argsOnly = true) ServerWorld world) {
+        Random rng = ((IMinecraftServer) world.getServer()).mobspawn$getRNGManager().offsetRandom;
         return rng.nextInt(i);
     }
 
@@ -73,6 +84,31 @@ public abstract class SpawnHelperMixin {
             index = 4
     )
     private static Random standardizeSpawnEntry(Random random, @Local(argsOnly = true) ServerWorld world) {
-        return ((IMinecraftServer) world.getServer()).mobspawn$getRNGManager().getRNG();
+        return ((IMinecraftServer) world.getServer()).mobspawn$getRNGManager().mobRandom;
+    }
+
+    @Redirect(
+            method = "spawnEntitiesInChunk(Lnet/minecraft/entity/SpawnGroup;Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/world/chunk/Chunk;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/SpawnHelper$Checker;Lnet/minecraft/world/SpawnHelper$Runner;)V",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Ljava/util/Random;nextInt(I)I",
+                    ordinal = 4
+            )
+    )
+    private static int standardizePackSize(Random original, int i, @Local(argsOnly = true) ServerWorld world) {
+        Random rng = ((IMinecraftServer) world.getServer()).mobspawn$getRNGManager().mobRandom;
+        return rng.nextInt(i);
+    }
+
+    @ModifyArg(
+            method = "canSpawn(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/SpawnGroup;Lnet/minecraft/world/gen/StructureAccessor;Lnet/minecraft/world/gen/chunk/ChunkGenerator;Lnet/minecraft/world/biome/Biome$SpawnEntry;Lnet/minecraft/util/math/BlockPos$Mutable;D)Z",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/entity/SpawnRestriction;canSpawn(Lnet/minecraft/entity/EntityType;Lnet/minecraft/world/WorldAccess;Lnet/minecraft/entity/SpawnReason;Lnet/minecraft/util/math/BlockPos;Ljava/util/Random;)Z"
+            ),
+            index = 4
+    )
+    private static Random standardizeSpawnChecks(Random random, @Local(argsOnly = true) ServerWorld world) {
+        return ((IMinecraftServer) world.getServer()).mobspawn$getRNGManager().mobRandom;
     }
 }
