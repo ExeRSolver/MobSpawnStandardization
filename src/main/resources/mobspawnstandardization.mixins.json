@@ -10,6 +10,12 @@
   },
   "mixins": [
     "MinecraftServerMixin",
-    "SpawnHelperMixin"
+    "OceanMonumentPieceMixin",
+    "OceanRuinPieceMixin",
+    "SpawnHelperMixin",
+    "StructureMixin",
+    "SwampHutGeneratorMixin",
+    "WoodlandMansionPieceMixin",
+    "access.EntityAccessor"
   ]
 }

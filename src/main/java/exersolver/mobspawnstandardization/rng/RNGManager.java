@@ -18,6 +18,10 @@ public class RNGManager {
         this.rngSeed = rngSeed;
     }
 
+    public long getRngSeed() {
+        return this.rngSeed;
+    }
+
     public void setRNGForSpawnCycle(ChunkPos cPos, DimensionType dimType, SpawnGroup category) {
         int dimensionId = dimType.hasEnderDragonFight() ? 2 : dimType.hasCeiling() ? 1 : 0;
         SpawningRNGSection section = new SpawningRNGSection(cPos.x, cPos.z, dimensionId, category.ordinal());
@@ -29,7 +33,7 @@ public class RNGManager {
         this.baseRandom = new Random(rng.nextLong());
     }
 
-    private static long mixSeed(long rngSeed, int... salts) {
+    public static long mixSeed(long rngSeed, int... salts) {
         for (int salt : salts) {
             rngSeed ^= salt;
 

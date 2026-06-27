@@ -2,11 +2,15 @@ package exersolver.mobspawnstandardization.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import exersolver.mobspawnstandardization.IMinecraftServer;
+import exersolver.mobspawnstandardization.mixin.access.EntityAccessor;
 import exersolver.mobspawnstandardization.rng.RNGManager;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.SpawnHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.chunk.WorldChunk;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
@@ -110,5 +114,33 @@ public abstract class SpawnHelperMixin {
     )
     private static Random standardizeSpawnChecks(Random random, @Local(argsOnly = true) ServerWorld world) {
         return ((IMinecraftServer) world.getServer()).mobspawn$getRNGManager().mobRandom;
+    }
+
+    @Inject(
+            method = "spawnEntitiesInChunk(Lnet/minecraft/entity/SpawnGroup;Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/world/chunk/Chunk;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/SpawnHelper$Checker;Lnet/minecraft/world/SpawnHelper$Runner;)V",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/entity/mob/MobEntity;initialize(Lnet/minecraft/world/WorldAccess;Lnet/minecraft/world/LocalDifficulty;Lnet/minecraft/entity/SpawnReason;Lnet/minecraft/entity/EntityData;Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/entity/EntityData;"
+            )
+    )
+    private static void standardizeMobRNG(CallbackInfo ci, @Local(argsOnly = true) ServerWorld world, @Local MobEntity mobEntity) {
+        BlockPos pos = mobEntity.getBlockPos();
+        long rngSeed = ((IMinecraftServer) world.getServer()).mobspawn$getRNGManager().getRngSeed();
+        Random random = new Random(RNGManager.mixSeed(rngSeed, pos.getX(), pos.getY(), pos.getZ()));
+        ((EntityAccessor) mobEntity).setRandom(random);
+    }
+
+    @Inject(
+            method = "populateEntities",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/entity/mob/MobEntity;initialize(Lnet/minecraft/world/WorldAccess;Lnet/minecraft/world/LocalDifficulty;Lnet/minecraft/entity/SpawnReason;Lnet/minecraft/entity/EntityData;Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/entity/EntityData;"
+            )
+    )
+    private static void standardizeMobRNG(CallbackInfo ci, @Local(argsOnly = true) WorldAccess world, @Local MobEntity mobEntity) {
+        BlockPos pos = mobEntity.getBlockPos();
+        long rngSeed = ((IMinecraftServer) world.getWorld().getServer()).mobspawn$getRNGManager().getRngSeed();
+        Random random = new Random(RNGManager.mixSeed(rngSeed, pos.getX(), pos.getY(), pos.getZ()));
+        ((EntityAccessor) mobEntity).setRandom(random);
     }
 }
