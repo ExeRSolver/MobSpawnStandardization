@@ -16,6 +16,11 @@
     "StructureMixin",
     "SwampHutGeneratorMixin",
     "WoodlandMansionPieceMixin",
-    "access.EntityAccessor"
+    "access.EntityAccessor",
+    "mob.HoglinEntityMixin",
+    "mob.PiglinEntityMixin",
+    "mob.SheepEntityMixin",
+    "mob.SpiderEntityMixin",
+    "mob.ZombieEntityMixin"
   ]
 }

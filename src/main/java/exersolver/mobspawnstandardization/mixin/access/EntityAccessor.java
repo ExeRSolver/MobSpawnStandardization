@@ -10,6 +10,9 @@ import java.util.Random;
 @Mixin(Entity.class)
 public interface EntityAccessor {
     @Accessor("random")
+    Random getRandom();
+
+    @Accessor("random")
     @Mutable
     void setRandom(Random random);
 }
