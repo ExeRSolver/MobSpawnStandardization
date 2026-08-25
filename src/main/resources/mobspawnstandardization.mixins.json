@@ -18,6 +18,7 @@
     "WoodlandMansionPieceMixin",
     "access.EntityAccessor",
     "mob.HoglinEntityMixin",
+    "mob.MobEntityMixin",
     "mob.PiglinEntityMixin",
     "mob.SheepEntityMixin",
     "mob.SpiderEntityMixin",
