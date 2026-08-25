@@ -23,7 +23,7 @@ import java.util.Random;
 public abstract class MobEntityMixin extends LivingEntity {
 
     @Unique
-    private int despawnTimer;
+    private Random despawnRandom;
 
     protected MobEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
@@ -31,12 +31,11 @@ public abstract class MobEntityMixin extends LivingEntity {
 
     @Inject(method = "initialize", at = @At("HEAD"))
     public void initDespawnTimer(WorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, EntityData entityData, CompoundTag entityTag, CallbackInfoReturnable<EntityData> cir) {
-        this.despawnTimer = this.getRandom().nextInt(800);
+        this.despawnRandom = new Random(this.getRandom().nextLong());
     }
 
     @WrapOperation(method = "checkDespawn", at = @At(value = "INVOKE", target = "Ljava/util/Random;nextInt(I)I"))
     public int redirectDespawnRNG(Random instance, int bound, Operation<Integer> original) {
-        if (this.despawnTimer-- <= 0) return 0;
-        return 1;
+        return original.call(this.despawnRandom, bound);
     }
 }
