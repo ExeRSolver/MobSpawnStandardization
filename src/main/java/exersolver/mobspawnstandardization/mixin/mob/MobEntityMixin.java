@@ -36,6 +36,6 @@ public abstract class MobEntityMixin extends LivingEntity {
 
     @WrapOperation(method = "checkDespawn", at = @At(value = "INVOKE", target = "Ljava/util/Random;nextInt(I)I"))
     public int redirectDespawnRNG(Random instance, int bound, Operation<Integer> original) {
-        return original.call(this.despawnRandom, bound);
+        return original.call(this.despawnRandom == null ? instance : this.despawnRandom, bound);
     }
 }
