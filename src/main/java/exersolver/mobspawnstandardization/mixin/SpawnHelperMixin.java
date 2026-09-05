@@ -2,6 +2,7 @@ package exersolver.mobspawnstandardization.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import exersolver.mobspawnstandardization.IMinecraftServer;
+import exersolver.mobspawnstandardization.MobSpawnStandardization;
 import exersolver.mobspawnstandardization.mixin.access.EntityAccessor;
 import exersolver.mobspawnstandardization.rng.RNGManager;
 import net.minecraft.entity.SpawnGroup;
@@ -26,6 +27,9 @@ public abstract class SpawnHelperMixin {
             at = @At("HEAD")
     )
     private static void setRNG(SpawnGroup group, ServerWorld world, WorldChunk chunk, SpawnHelper.Checker checker, SpawnHelper.Runner runner, CallbackInfo ci) {
+        if (!MobSpawnStandardization.isStandardMobSpawning(world)) {
+            return;
+        }
         ((IMinecraftServer) world.getServer()).mobspawn$getRNGManager().setRNGForSpawnCycle(chunk.getPos(), world.getDimension(), group);
     }
 
@@ -37,6 +41,9 @@ public abstract class SpawnHelperMixin {
             )
     )
     private static int standardizeSpawnPos(Random original, int i, @Local(argsOnly = true) World world) {
+        if (!MobSpawnStandardization.isStandardMobSpawning(world)) {
+            return original.nextInt(i);
+        }
         Random rng = ((IMinecraftServer) world.getServer()).mobspawn$getRNGManager().baseRandom;
         return rng.nextInt(i);
     }
@@ -50,6 +57,9 @@ public abstract class SpawnHelperMixin {
             )
     )
     private static float standardizeAttemptCount(Random original, @Local(argsOnly = true) ServerWorld world) {
+        if (!MobSpawnStandardization.isStandardMobSpawning(world)) {
+            return original.nextFloat();
+        }
         RNGManager rngManager = ((IMinecraftServer) world.getServer()).mobspawn$getRNGManager();
         Random rng = rngManager.baseRandom;
         rngManager.offsetRandom = new Random(rng.nextLong());
@@ -75,6 +85,9 @@ public abstract class SpawnHelperMixin {
             )
     )
     private static int standardizeOffset(Random original, int i, @Local(argsOnly = true) ServerWorld world) {
+        if (!MobSpawnStandardization.isStandardMobSpawning(world)) {
+            return original.nextInt(i);
+        }
         Random rng = ((IMinecraftServer) world.getServer()).mobspawn$getRNGManager().offsetRandom;
         return rng.nextInt(i);
     }
@@ -88,6 +101,9 @@ public abstract class SpawnHelperMixin {
             index = 4
     )
     private static Random standardizeSpawnEntry(Random random, @Local(argsOnly = true) ServerWorld world) {
+        if (!MobSpawnStandardization.isStandardMobSpawning(world)) {
+            return random;
+        }
         return ((IMinecraftServer) world.getServer()).mobspawn$getRNGManager().mobRandom;
     }
 
@@ -100,6 +116,9 @@ public abstract class SpawnHelperMixin {
             )
     )
     private static int standardizePackSize(Random original, int i, @Local(argsOnly = true) ServerWorld world) {
+        if (!MobSpawnStandardization.isStandardMobSpawning(world)) {
+            return original.nextInt(i);
+        }
         Random rng = ((IMinecraftServer) world.getServer()).mobspawn$getRNGManager().mobRandom;
         return rng.nextInt(i);
     }
@@ -113,6 +132,9 @@ public abstract class SpawnHelperMixin {
             index = 4
     )
     private static Random standardizeSpawnChecks(Random random, @Local(argsOnly = true) ServerWorld world) {
+        if (!MobSpawnStandardization.isStandardMobSpawning(world)) {
+            return random;
+        }
         return ((IMinecraftServer) world.getServer()).mobspawn$getRNGManager().mobRandom;
     }
 
@@ -124,6 +146,9 @@ public abstract class SpawnHelperMixin {
             )
     )
     private static void standardizeMobRNG(CallbackInfo ci, @Local(argsOnly = true) ServerWorld world, @Local MobEntity mobEntity) {
+        if (!MobSpawnStandardization.isStandardMobSpawning(world)) {
+            return;
+        }
         BlockPos pos = mobEntity.getBlockPos();
         long rngSeed = ((IMinecraftServer) world.getServer()).mobspawn$getRNGManager().getRngSeed();
         Random random = new Random(RNGManager.mixSeed(rngSeed, pos.getX(), pos.getY(), pos.getZ()));
@@ -138,6 +163,9 @@ public abstract class SpawnHelperMixin {
             )
     )
     private static void standardizeMobRNG(CallbackInfo ci, @Local(argsOnly = true) WorldAccess world, @Local MobEntity mobEntity) {
+        if (!MobSpawnStandardization.isStandardMobSpawning(world.getWorld())) {
+            return;
+        }
         BlockPos pos = mobEntity.getBlockPos();
         long rngSeed = ((IMinecraftServer) world.getWorld().getServer()).mobspawn$getRNGManager().getRngSeed();
         Random random = new Random(RNGManager.mixSeed(rngSeed, pos.getX(), pos.getY(), pos.getZ()));

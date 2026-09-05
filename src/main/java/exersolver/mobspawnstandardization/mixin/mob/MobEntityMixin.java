@@ -2,6 +2,7 @@ package exersolver.mobspawnstandardization.mixin.mob;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import exersolver.mobspawnstandardization.MobSpawnStandardization;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -31,11 +32,16 @@ public abstract class MobEntityMixin extends LivingEntity {
 
     @Inject(method = "initialize", at = @At("HEAD"))
     public void initDespawnTimer(WorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, EntityData entityData, CompoundTag entityTag, CallbackInfoReturnable<EntityData> cir) {
-        this.despawnRandom = new Random(this.getRandom().nextLong());
+        if (MobSpawnStandardization.isStandardMobSpawning(world.getWorld())) {
+            this.despawnRandom = new Random(this.getRandom().nextLong());
+        }
     }
 
     @WrapOperation(method = "checkDespawn", at = @At(value = "INVOKE", target = "Ljava/util/Random;nextInt(I)I"))
     public int redirectDespawnRNG(Random instance, int bound, Operation<Integer> original) {
-        return original.call(this.despawnRandom == null ? instance : this.despawnRandom, bound);
+        if (this.despawnRandom == null || !MobSpawnStandardization.isStandardMobSpawning(this.world)) {
+            return original.call(instance, bound);
+        }
+        return original.call(this.despawnRandom, bound);
     }
 }

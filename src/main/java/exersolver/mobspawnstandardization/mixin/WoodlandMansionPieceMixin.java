@@ -2,6 +2,7 @@ package exersolver.mobspawnstandardization.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import exersolver.mobspawnstandardization.IMinecraftServer;
+import exersolver.mobspawnstandardization.MobSpawnStandardization;
 import exersolver.mobspawnstandardization.mixin.access.EntityAccessor;
 import exersolver.mobspawnstandardization.rng.RNGManager;
 import net.minecraft.entity.mob.IllagerEntity;
@@ -26,6 +27,9 @@ public abstract class WoodlandMansionPieceMixin {
             )
     )
     private void standardizeMobRNG(CallbackInfo ci, @Local(argsOnly = true) WorldAccess world, @Local IllagerEntity illagerEntity) {
+        if (!MobSpawnStandardization.isStandardMobSpawning(world.getWorld())) {
+            return;
+        }
         BlockPos pos = illagerEntity.getBlockPos();
         long rngSeed = ((IMinecraftServer) world.getWorld().getServer()).mobspawn$getRNGManager().getRngSeed();
         Random random = new Random(RNGManager.mixSeed(rngSeed, pos.getX(), pos.getY(), pos.getZ()));

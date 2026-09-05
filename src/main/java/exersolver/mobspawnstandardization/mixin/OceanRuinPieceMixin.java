@@ -2,6 +2,7 @@ package exersolver.mobspawnstandardization.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import exersolver.mobspawnstandardization.IMinecraftServer;
+import exersolver.mobspawnstandardization.MobSpawnStandardization;
 import exersolver.mobspawnstandardization.mixin.access.EntityAccessor;
 import exersolver.mobspawnstandardization.rng.RNGManager;
 import net.minecraft.entity.mob.DrownedEntity;
@@ -26,6 +27,9 @@ public abstract class OceanRuinPieceMixin {
             )
     )
     private void standardizeMobRNG(CallbackInfo ci, @Local(argsOnly = true) WorldAccess world, @Local DrownedEntity drownedEntity) {
+        if (!MobSpawnStandardization.isStandardMobSpawning(world.getWorld())) {
+            return;
+        }
         BlockPos pos = drownedEntity.getBlockPos();
         long rngSeed = ((IMinecraftServer) world.getWorld().getServer()).mobspawn$getRNGManager().getRngSeed();
         Random random = new Random(RNGManager.mixSeed(rngSeed, pos.getX(), pos.getY(), pos.getZ()));

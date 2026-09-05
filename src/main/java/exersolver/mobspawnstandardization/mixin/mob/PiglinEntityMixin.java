@@ -1,5 +1,6 @@
 package exersolver.mobspawnstandardization.mixin.mob;
 
+import exersolver.mobspawnstandardization.MobSpawnStandardization;
 import exersolver.mobspawnstandardization.mixin.access.EntityAccessor;
 import net.minecraft.entity.mob.PiglinEntity;
 import net.minecraft.world.World;
@@ -21,6 +22,9 @@ public abstract class PiglinEntityMixin {
             )
     )
     private Random standardizeBaby(WorldAccess world) {
+        if (!MobSpawnStandardization.isStandardMobSpawning(world.getWorld())) {
+            return world.getRandom();
+        }
         return ((EntityAccessor) this).getRandom();
     }
 
@@ -33,6 +37,9 @@ public abstract class PiglinEntityMixin {
             )
     )
     private Random standardizeEquipment(World world) {
+        if (!MobSpawnStandardization.isStandardMobSpawning(world)) {
+            return world.random;
+        }
         return ((EntityAccessor) this).getRandom();
     }
 }

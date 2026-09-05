@@ -1,5 +1,6 @@
 package exersolver.mobspawnstandardization.mixin.mob;
 
+import exersolver.mobspawnstandardization.MobSpawnStandardization;
 import exersolver.mobspawnstandardization.mixin.access.EntityAccessor;
 import net.minecraft.entity.mob.HoglinEntity;
 import net.minecraft.world.WorldAccess;
@@ -20,6 +21,9 @@ public abstract class HoglinEntityMixin {
             )
     )
     private Random standardizeBaby(WorldAccess world) {
+        if (!MobSpawnStandardization.isStandardMobSpawning(world.getWorld())) {
+            return world.getRandom();
+        }
         return ((EntityAccessor) this).getRandom();
     }
 }
