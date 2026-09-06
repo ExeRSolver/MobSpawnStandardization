@@ -23,7 +23,7 @@ public class RNGManager {
     }
 
     public void setRNGForSpawnCycle(ChunkPos cPos, DimensionType dimType, SpawnGroup category) {
-        int dimensionId = dimType.hasEnderDragonFight() ? 2 : dimType.hasCeiling() ? 1 : 0;
+        int dimensionId = getDimensionId(dimType);
         SpawningRNGSection section = new SpawningRNGSection(cPos.x, cPos.z, dimensionId, category.ordinal());
         Random rng = this.rngMap.get(section);
         if (rng == null) {
@@ -42,5 +42,9 @@ public class RNGManager {
             rngSeed ^= (rngSeed >>> 31);
         }
         return rngSeed;
+    }
+
+    public static int getDimensionId(DimensionType dimType) {
+        return dimType.hasEnderDragonFight() ? 2 : dimType.hasCeiling() ? 1 : 0;
     }
 }

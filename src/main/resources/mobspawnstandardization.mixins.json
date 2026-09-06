@@ -12,6 +12,7 @@
     "MinecraftServerMixin",
     "OceanMonumentPieceMixin",
     "OceanRuinPieceMixin",
+    "ServerChunkManagerMixin",
     "SpawnHelperMixin",
     "StructureMixin",
     "SwampHutGeneratorMixin",
