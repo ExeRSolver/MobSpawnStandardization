@@ -150,8 +150,7 @@ public abstract class SpawnHelperMixin {
             return;
         }
         BlockPos pos = mobEntity.getBlockPos();
-        long rngSeed = ((IMinecraftServer) world.getServer()).mobspawn$getRNGManager().getRngSeed();
-        Random random = new Random(RNGManager.mixSeed(rngSeed, pos.getX(), pos.getY(), pos.getZ()));
+        Random random = RNGManager.getMobRng(world, pos.getX(), pos.getY(), pos.getZ());
         ((EntityAccessor) mobEntity).setRandom(random);
     }
 
@@ -167,8 +166,7 @@ public abstract class SpawnHelperMixin {
             return;
         }
         BlockPos pos = mobEntity.getBlockPos();
-        long rngSeed = ((IMinecraftServer) world.getWorld().getServer()).mobspawn$getRNGManager().getRngSeed();
-        Random random = new Random(RNGManager.mixSeed(rngSeed, pos.getX(), pos.getY(), pos.getZ()));
+        Random random = RNGManager.getMobRng(world, pos.getX(), pos.getY(), pos.getZ());
         ((EntityAccessor) mobEntity).setRandom(random);
     }
 }

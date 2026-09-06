@@ -1,7 +1,9 @@
 package exersolver.mobspawnstandardization.rng;
 
+import exersolver.mobspawnstandardization.IMinecraftServer;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.dimension.DimensionType;
 
 import java.util.HashMap;
@@ -27,10 +29,15 @@ public class RNGManager {
         SpawningRNGSection section = new SpawningRNGSection(cPos.x, cPos.z, dimensionId, category.ordinal());
         Random rng = this.rngMap.get(section);
         if (rng == null) {
-            rng = new Random(mixSeed(this.rngSeed, section.chunkX, section.chunkZ, section.dimensionId, section.categoryId));
+            rng = new Random(mixSeed(this.rngSeed, MixingType.SPAWN_CYCLE_RNG.ordinal(), cPos.x, cPos.z, dimensionId, section.categoryId));
             this.rngMap.put(section, rng);
         }
         this.baseRandom = new Random(rng.nextLong());
+    }
+
+    public static Random getMobRng(WorldAccess world, int x, int y, int z) {
+        long rngSeed = ((IMinecraftServer) world.getWorld().getServer()).mobspawn$getRNGManager().getRngSeed();
+        return new Random(mixSeed(rngSeed, MixingType.MOB_RNG.ordinal(), x, y, z));
     }
 
     public static long mixSeed(long rngSeed, int... salts) {
@@ -46,5 +53,9 @@ public class RNGManager {
 
     public static int getDimensionId(DimensionType dimType) {
         return dimType.hasEnderDragonFight() ? 2 : dimType.hasCeiling() ? 1 : 0;
+    }
+
+    public enum MixingType {
+        SPAWN_CYCLE_RNG, MOB_RNG, CHUNK_PRIORITY
     }
 }

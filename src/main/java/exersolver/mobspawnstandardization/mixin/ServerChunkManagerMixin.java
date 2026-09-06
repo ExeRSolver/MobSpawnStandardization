@@ -37,8 +37,9 @@ public abstract class ServerChunkManagerMixin {
             return;
         }
 
-        RNGManager rngManager = ((IMinecraftServer) this.world.getServer()).mobspawn$getRNGManager();
         int dimensionId = RNGManager.getDimensionId(this.world.getDimension());
+        long rngSeed = ((IMinecraftServer) this.world.getServer()).mobspawn$getRNGManager().getRngSeed();
+        rngSeed = RNGManager.mixSeed(rngSeed, RNGManager.MixingType.CHUNK_PRIORITY.ordinal(), dimensionId);
 
         PrioritizedChunkHolder[] prioritizedList = new PrioritizedChunkHolder[list.size()];
         for (int i = 0; i < list.size(); i++) {
@@ -46,7 +47,7 @@ public abstract class ServerChunkManagerMixin {
             WorldChunk chunk = holder.getWorldChunk();
             long inhabitedTime = chunk != null ? chunk.getInhabitedTime() : 0L;
             ChunkPos pos = holder.getPos();
-            long priority = RNGManager.mixSeed(rngManager.getRngSeed(), pos.x, pos.z, dimensionId, (int) inhabitedTime);
+            long priority = RNGManager.mixSeed(rngSeed, pos.x, pos.z, (int) inhabitedTime);
             prioritizedList[i] = new PrioritizedChunkHolder(holder, priority);
         }
 
