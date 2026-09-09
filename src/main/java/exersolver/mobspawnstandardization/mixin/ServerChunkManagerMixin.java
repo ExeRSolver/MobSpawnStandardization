@@ -2,6 +2,7 @@ package exersolver.mobspawnstandardization.mixin;
 
 import exersolver.mobspawnstandardization.IMinecraftServer;
 import exersolver.mobspawnstandardization.MobSpawnStandardization;
+import exersolver.mobspawnstandardization.chunk.PrioritizedChunkHolder;
 import exersolver.mobspawnstandardization.rng.RNGManager;
 import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.server.world.ServerChunkManager;
@@ -58,18 +59,5 @@ public abstract class ServerChunkManagerMixin {
         }
     }
 
-    private static class PrioritizedChunkHolder implements Comparable<PrioritizedChunkHolder> {
-        final ChunkHolder holder;
-        final long priority;
 
-        PrioritizedChunkHolder(ChunkHolder holder, long priority) {
-            this.holder = holder;
-            this.priority = priority;
-        }
-
-        @Override
-        public int compareTo(PrioritizedChunkHolder o) {
-            return Long.compare(o.priority, this.priority);
-        }
-    }
 }
